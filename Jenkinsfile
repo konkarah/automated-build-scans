@@ -71,31 +71,7 @@ pipeline {
             }
         }
         
-        stage('🔍 Dependency Security Scan') {
-            steps {
-                echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-                echo '🔍 Stage 5: Scanning dependencies'
-                echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-                script {
-                    try {
-                        sh 'mvn org.owasp:dependency-check-maven:check'
-                    } catch (Exception e) {
-                        echo '⚠️  Dependency check completed with warnings'
-                    }
-                }
-            }
-            post {
-                always {
-                    publishHTML([
-                        reportDir: 'target',
-                        reportFiles: 'dependency-check-report.html',
-                        reportName: 'OWASP Dependency Check',
-                        alwaysLinkToLastBuild: true,
-                        allowMissing: true
-                    ])
-                }
-            }
-        }
+        // Dependency scan skipped for demo - would require NVD API key
         
         stage('🐳 Build Docker Image') {
             steps {
