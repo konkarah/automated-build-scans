@@ -98,10 +98,17 @@ pipeline {
                     sh """
                         # JSON report for parsing
                         trivy image \
-                        --timeout 10m \
+                        --timeout 15m \
                         --scanners vuln \
+                        --skip-java-db-update \
                         --format json \
                         --output trivy-report.json \
+                        ${DOCKER_IMAGE}:${IMAGE_TAG}
+                        
+                        # Human-readable report
+                        trivy image \
+                        --format table \
+                        --output trivy-report.txt \
                         ${DOCKER_IMAGE}:${IMAGE_TAG}
                         
                         # Display summary
