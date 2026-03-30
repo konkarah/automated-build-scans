@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.12</version> <!-- Updated from 3.2.0 to latest security patched version -->
+        <version>3.3.8</version> <!-- Update to latest Spring Boot 3.3.x -->
     </parent>
     
     <groupId>com.example</groupId>
@@ -21,11 +21,14 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <!-- Explicitly manage vulnerable dependency versions -->
-        <snakeyaml.version>2.2</snakeyaml.version>
-        <jackson.version>2.17.2</jackson.version>
-        <log4j2.version>2.23.1</log4j2.version>
-        <tomcat.version>10.1.26</tomcat.version>
+        <!-- Explicitly manage all vulnerable dependency versions -->
+        <snakeyaml.version>2.3</snakeyaml.version>
+        <jackson.version>2.18.2</jackson.version>
+        <log4j2.version>2.24.3</log4j2.version>
+        <tomcat.version>10.1.35</tomcat.version>
+        <spring-framework.version>6.1.16</spring-framework.version>
+        <commons-compress.version>1.27.1</commons-compress.version>
+        <netty.version>4.1.117.Final</netty.version>
     </properties>
     
     <dependencies>
@@ -48,6 +51,15 @@
     
     <dependencyManagement>
         <dependencies>
+            <!-- Override Spring Framework to fix recent CVEs -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            
             <!-- Override SnakeYAML to fix CVE-2022-1471 -->
             <dependency>
                 <groupId>org.yaml</groupId>
@@ -55,38 +67,22 @@
                 <version>${snakeyaml.version}</version>
             </dependency>
             
-            <!-- Override Jackson Databind to fix multiple CVEs -->
+            <!-- Override Jackson to fix multiple CVEs -->
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             
             <!-- Override Log4j2 to fix Log4Shell and other CVEs -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
+                <artifactId>log4j-bom</artifactId>
                 <version>${log4j2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4j2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-jul</artifactId>
-                <version>${log4j2.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             
             <!-- Override Tomcat to fix multiple CVEs -->
@@ -104,6 +100,22 @@
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-websocket</artifactId>
                 <version>${tomcat.version}</version>
+            </dependency>
+            
+            <!-- Override Commons Compress if used -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
+            </dependency>
+            
+            <!-- Override Netty if used by Spring Boot -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
