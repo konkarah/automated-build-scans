@@ -25,14 +25,14 @@ COPY --from=builder /app/target/*.jar app.jar
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
 
+# Install wget for healthcheck (as root before switching user)
+RUN apk add --no-cache wget
+
 # Switch to non-root user
 USER appuser
 
 # Expose port
 EXPOSE 8080
-
-# Install wget for healthcheck
-RUN apk add --no-cache wget
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
