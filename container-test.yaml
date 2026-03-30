@@ -1,0 +1,26 @@
+schemaVersion: '2.0.0'
+
+commandTests:
+  - name: 'Application health check responds'
+    command: 'sh'
+    args: ['-c', 'sleep 10 && wget -O - http://localhost:8080/health']
+    expectedOutput: ['UP']
+
+fileExistenceTests:
+  - name: 'Application JAR exists'
+    path: '/app/app.jar'
+    shouldExist: true
+  
+  - name: 'No secrets in image'
+    path: '/app/.env'
+    shouldExist: false
+
+metadataTest:
+  exposedPorts: ['8080']
+  user: 'appuser'
+  workdir: '/app'
+  
+  labels:
+    - key: 'maintainer'
+      value: 'your-team@example.com'
+      isPresent: false
