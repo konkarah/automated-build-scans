@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.8</version> <!-- Update to latest Spring Boot 3.3.x -->
+        <version>3.3.8</version>
     </parent>
     
     <groupId>com.example</groupId>
@@ -21,14 +21,15 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <!-- Explicitly manage all vulnerable dependency versions -->
-        <snakeyaml.version>2.3</snakeyaml.version>
-        <jackson.version>2.18.2</jackson.version>
-        <log4j2.version>2.24.3</log4j2.version>
-        <tomcat.version>10.1.35</tomcat.version>
+        
+        <!-- Version overrides for security fixes -->
         <spring-framework.version>6.1.16</spring-framework.version>
-        <commons-compress.version>1.27.1</commons-compress.version>
+        <tomcat.version>10.1.35</tomcat.version>
+        <jackson.version>2.17.3</jackson.version>
+        <snakeyaml.version>2.3</snakeyaml.version>
+        <log4j2.version>2.24.3</log4j2.version>
         <netty.version>4.1.117.Final</netty.version>
+        <commons-codec.version>1.17.1</commons-codec.version>
     </properties>
     
     <dependencies>
@@ -51,7 +52,7 @@
     
     <dependencyManagement>
         <dependencies>
-            <!-- Override Spring Framework to fix recent CVEs -->
+            <!-- Override Spring Framework to fix CVE-2024-22243, CVE-2024-22262 -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
@@ -60,32 +61,7 @@
                 <scope>import</scope>
             </dependency>
             
-            <!-- Override SnakeYAML to fix CVE-2022-1471 -->
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>${snakeyaml.version}</version>
-            </dependency>
-            
-            <!-- Override Jackson to fix multiple CVEs -->
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            
-            <!-- Override Log4j2 to fix Log4Shell and other CVEs -->
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>${log4j2.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            
-            <!-- Override Tomcat to fix multiple CVEs -->
+            <!-- Override Tomcat to fix CVE-2024-24549, CVE-2024-34750, etc -->
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
@@ -102,20 +78,56 @@
                 <version>${tomcat.version}</version>
             </dependency>
             
-            <!-- Override Commons Compress if used -->
+            <!-- Override Jackson to fix databind CVEs -->
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>${commons-compress.version}</version>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
             
-            <!-- Override Netty if used by Spring Boot -->
+            <!-- Override SnakeYAML to fix CVE-2022-1471 -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+            
+            <!-- Override Log4j2 to fix Log4Shell and other CVEs -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            
+            <!-- Override Netty if used -->
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            
+            <!-- Override Commons Codec for CVE-2024-25126 -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -127,7 +139,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             
-            <!-- OWASP Dependency Check Plugin -->
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
