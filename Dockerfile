@@ -8,11 +8,14 @@ COPY src ./src
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Runtime stage - using correct slim image
-FROM eclipse-temurin:17-jre-slim-bullseye
+# Runtime stage - using Alpine for minimal size
+FROM eclipse-temurin:17-jre-alpine
+
+# Update Alpine packages to latest (important for security)
+RUN apk update && apk upgrade
 
 # Create non-root user for security
-RUN addgroup --system appgroup && adduser --system --no-create-home --ingroup appgroup appuser
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
@@ -28,8 +31,10 @@ USER appuser
 # Expose port
 EXPOSE 8080
 
-# Health check using wget (install if needed)
-RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
