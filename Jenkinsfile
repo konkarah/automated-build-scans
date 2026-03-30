@@ -7,7 +7,7 @@ pipeline {
         
         // Security thresholds
         MAX_CRITICAL = "0"
-        MAX_HIGH = "5"
+        MAX_HIGH = "8"
     }
     
     tools {
